@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class RenderovanjeMatrice extends Application
+public class MatricaPromenljivihDimenzija extends Application
 {
 
     private double sceneWidth = 1024;
@@ -72,7 +72,7 @@ public class RenderovanjeMatrice extends Application
     }
     
     private static Map<Integer, String> keyValues = new HashMap<>();
-    public RenderovanjeMatrice()
+    public MatricaPromenljivihDimenzija()
     {
         keyValues.put(0, "lightblue");
         keyValues.put(1, "blue");
