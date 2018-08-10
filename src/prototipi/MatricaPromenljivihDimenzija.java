@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class RenderovanjeMatrice extends Application
+public class MatricaPromenljivihDimenzija extends Application
 {
 
     private double sceneWidth = 1024;
@@ -58,6 +58,7 @@ public class RenderovanjeMatrice extends Application
     {
         playfield = new Cell[n][m];
         group.getChildren().clear();
+        matrix = createMatrix(n, m, 0);
         System.out.println(group.getChildren().size());
         for(int i=0;  i<matrix.length; i++)
         {
@@ -71,12 +72,12 @@ public class RenderovanjeMatrice extends Application
     }
     
     private static Map<Integer, String> keyValues = new HashMap<>();
-    public RenderovanjeMatrice()
+    public MatricaPromenljivihDimenzija()
     {
         keyValues.put(0, "lightblue");
         keyValues.put(1, "blue");
-        matrix = createMatrix(n, m, 0);
-        matrix[0][0] = 1;
+//        matrix = createMatrix(n, m, 0);
+//        matrix[0][0] = 1;
     }
     
     private TextField rowsInput = new TextField(""+n);
@@ -102,18 +103,19 @@ public class RenderovanjeMatrice extends Application
                 return;
             }
             renderMatrix();
+            scrollPane.setContent(group);
         });
     }
     
     private GridPane gridPane = new GridPane();
+    private ScrollPane scrollPane = new ScrollPane();
     
     @Override
     public void start(Stage primaryStage)
     {
         renderMatrix();
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(group);
         
+        scrollPane.setContent(group);
         
         gridPane.setHgap(10);
         gridPane.setVgap(10);
