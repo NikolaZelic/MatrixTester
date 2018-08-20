@@ -14,6 +14,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
@@ -26,17 +28,19 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class Playground extends GridPane
+public final class Playground extends GridPane
 {
     // MATRIX DATA
     protected ObjectProperty<IntegerProperty[][]> matrix;
     protected Map<Integer, String> valueMap;
+    protected Map<Integer, String> valueLegend;
+    protected Integer selectLegend = null;
     protected void renderMatrix(){
         gridPane.getChildren().clear();
         IntegerProperty[][] m = matrix.getValue();
         for(int i=0; i<m.length; i++){
             for(int j=0; j<m[i].length; j++){
-                Cell cell = new Cell(m[i][j], valueMap);
+                Cell cell = new Cell(m[i][j], valueMap, this);
                 gridPane.add(cell, i, j);
             }
         }
@@ -65,8 +69,17 @@ public class Playground extends GridPane
         map.put(1, "green");
         return map;
     }
+    protected Map<Integer, String> defaultValueLegend(){
+        Map<Integer, String> result = new HashMap<>();
+        result.put(0, "Prolaz");
+        result.put(1, "Zid");
+        return result;
+    }
     public void setMatrix(IntegerProperty[][] matrix){
         this.matrix.setValue(matrix);
+    }
+    public IntegerProperty[][] getMatrix(){
+        return matrix.getValue();
     }
     protected IntegerProperty[][] newMatrix(int im, int jm){
         IntegerProperty[][] result = new IntegerProperty[im][jm];
@@ -100,7 +113,28 @@ public class Playground extends GridPane
     }
     protected void setUpLegend(){
         legend = new VBox();
-        legend.getChildren().add( new Label("Teks") );
+        Label header = new Label("Legend");
+        legend.getChildren().add(header);
+        ToggleGroup group = new ToggleGroup();
+        
+        valueLegend.forEach((k, v)->{
+            ToggleButton btn = new ToggleButton(v+" - "+valueMap.get(k));
+            btn.setToggleGroup(group);
+            btn.setUserData(k);
+            legend.getChildren().add(btn);
+            btn.setOnAction((event) -> {
+                selectLegend = (Integer)btn.getUserData();
+                System.out.println(selectLegend);
+            });
+        });
+        
+        ToggleButton clear = new ToggleButton("Toggle");
+        clear.setToggleGroup(group);
+        clear.setOnAction((event) -> {
+            selectLegend = null;
+            System.out.println(selectLegend);
+        });
+        legend.getChildren().add(clear);
     }
     protected void setUpHeder(){
         iTf = new TextField("20");
@@ -109,8 +143,7 @@ public class Playground extends GridPane
         changeDimenstionsBtn.setOnAction(this.changeDimesnionsEvent);
         heder = new HBox(iTf, jTf, changeDimenstionsBtn);
     }
-    protected EventHandler<ActionEvent> changeDimesnionsEvent = (ActionEvent event) ->
-    {
+    protected EventHandler<ActionEvent> changeDimesnionsEvent = (ActionEvent event) -> {
         try{
             int i = Integer.valueOf(iTf.getText());
             int j = Integer.valueOf(jTf.getText());
@@ -123,9 +156,13 @@ public class Playground extends GridPane
     };
     
     public Playground(){
+        valueMap = defaultValueMap();
+        valueLegend = defaultValueLegend();
+        setUpHeder();
         setUpGridPane();
         setUpLegend();
-        setUpHeder();
+        matrix = defaultMatrix();
+        renderMatrix();
         scroll = new ScrollPane(gridPane);
         
         getColumnConstraints().add(new ColumnConstraints(100)); 
@@ -133,10 +170,6 @@ public class Playground extends GridPane
         add(heder, 1, 0);
         add(legend, 0, 1);
         add(scroll, 1, 1);
-        
-        valueMap = defaultValueMap();
-        matrix = defaultMatrix();
-        renderMatrix();
     }
 }
 
@@ -145,7 +178,7 @@ class Cell extends Label
     protected IntegerProperty value;
     protected Map<Integer, String> valueMap;
 
-    public Cell(IntegerProperty value, Map<Integer, String> valueMap)
+    public Cell(IntegerProperty value, Map<Integer, String> valueMap, Playground parent)
     {
         this.value = value;
         this.valueMap = valueMap;
@@ -159,16 +192,21 @@ class Cell extends Label
         });
         setOnMouseClicked((MouseEvent event) ->
         {
-            int br = this.value.getValue();
-            while(true){
-                br++;
-                String get = this.valueMap.get(br);
-                if(get==null){
-                    br = -1;
-                    continue;
+            if(parent.selectLegend==null){
+                int br = this.value.getValue();
+                while(true){
+                    br++;
+                    String get = this.valueMap.get(br);
+                    if(get==null){
+                        br = -1;
+                        continue;
+                    }
+                    this.value.setValue(br);
+                    break;
                 }
-                this.value.setValue(br);
-                break;
+            }
+            else{
+                this.value.setValue(parent.selectLegend);
             }
         });
     }
