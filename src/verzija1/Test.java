@@ -8,7 +8,6 @@ import javafx.stage.Stage;
 
 public class Test extends Application
 {
-    
     @Override
     public void start(Stage primaryStage)
     {
@@ -18,8 +17,8 @@ public class Test extends Application
         valuelegend.put(0, "zid");
         valueMap.put(1, "green");
         valuelegend.put(1, "prolaz");
-        
         Playground p = new Playground(valueMap, valuelegend);
+        
         Scene scene = new Scene(p, 800, 400);
         
         primaryStage.setTitle("Hello World!");

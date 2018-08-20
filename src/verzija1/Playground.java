@@ -1,5 +1,6 @@
 package verzija1;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.beans.property.IntegerProperty;
@@ -27,6 +28,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 
 public final class Playground extends GridPane
 {
@@ -118,6 +120,8 @@ public final class Playground extends GridPane
     protected TextField iTf;
     protected TextField jTf;
     protected Button changeDimenstionsBtn;
+    protected Button save;
+    protected Button open;
     protected void setUpGridPane(){
         gridPane = new GridPane();
     }
@@ -151,7 +155,32 @@ public final class Playground extends GridPane
         jTf = new TextField("20");
         changeDimenstionsBtn = new Button("Change");
         changeDimenstionsBtn.setOnAction(this.changeDimesnionsEvent);
-        heder = new HBox(iTf, jTf, changeDimenstionsBtn);
+        
+        save = new Button("Save");
+        save.setOnAction((ActionEvent event) -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select output file");
+            fileChooser.setInitialFileName("output.txt");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text", "*.txt"));
+            File outputFile = fileChooser.showSaveDialog(getScene().getWindow());
+            if(outputFile==null)
+                return;
+            // Write matrix to file
+            
+        });
+        
+        open = new Button("open");
+        open.setOnAction((ActionEvent event) -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Resource File");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text", "*.txt"));
+            File inputFile = fileChooser.showOpenDialog(getScene().getWindow());
+            System.out.println(inputFile);
+            if(inputFile==null)
+                return;
+        });
+        
+        heder = new HBox(iTf, jTf, changeDimenstionsBtn, save, open);
     }
     protected EventHandler<ActionEvent> changeDimesnionsEvent = (ActionEvent event) -> {
         try{
