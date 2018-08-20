@@ -35,6 +35,14 @@ public final class Playground extends GridPane
     protected Map<Integer, String> valueMap;
     protected Map<Integer, String> valueLegend;
     protected Integer selectLegend = null;
+    
+    // MATRIX FUNCTIONS
+    public void setMatrix(IntegerProperty[][] matrix){
+        this.matrix.setValue(matrix);
+    }
+    public IntegerProperty[][] getMatrix(){
+        return matrix.getValue();
+    }
     protected void renderMatrix(){
         gridPane.getChildren().clear();
         IntegerProperty[][] m = matrix.getValue();
@@ -63,24 +71,6 @@ public final class Playground extends GridPane
         });
         return result;
     }
-    protected Map<Integer, String> defaultValueMap(){
-        Map<Integer, String> map =  new HashMap<>();
-        map.put(0, "blue");
-        map.put(1, "green");
-        return map;
-    }
-    protected Map<Integer, String> defaultValueLegend(){
-        Map<Integer, String> result = new HashMap<>();
-        result.put(0, "Prolaz");
-        result.put(1, "Zid");
-        return result;
-    }
-    public void setMatrix(IntegerProperty[][] matrix){
-        this.matrix.setValue(matrix);
-    }
-    public IntegerProperty[][] getMatrix(){
-        return matrix.getValue();
-    }
     protected IntegerProperty[][] newMatrix(int im, int jm){
         IntegerProperty[][] result = new IntegerProperty[im][jm];
         for(int i=0; i<im; i++)
@@ -98,6 +88,26 @@ public final class Playground extends GridPane
                 to[i][j].setValue(from[i][j].getValue());
             }
         }
+    }
+    
+    // VALUSE FUNCTIONS
+    public Map<Integer, String> getValueMap(){
+        return valueMap;
+    }
+    public Map<Integer, String> getValueLegend(){
+        return valueLegend;
+    }
+    protected Map<Integer, String> defaultValueMap(){
+        Map<Integer, String> map =  new HashMap<>();
+        map.put(0, "blue");
+        map.put(1, "green");
+        return map;
+    }
+    protected Map<Integer, String> defaultValueLegend(){
+        Map<Integer, String> result = new HashMap<>();
+        result.put(0, "Prolaz");
+        result.put(1, "Zid");
+        return result;
     }
     
     // JAVA_FX 
@@ -155,9 +165,9 @@ public final class Playground extends GridPane
         }
     };
     
-    public Playground(){
-        valueMap = defaultValueMap();
-        valueLegend = defaultValueLegend();
+    public Playground(Map<Integer, String> valuMap, Map<Integer, String> valueLegend){
+        this.valueMap = valuMap;
+        this.valueLegend = valueLegend;
         setUpHeder();
         setUpGridPane();
         setUpLegend();
