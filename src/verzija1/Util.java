@@ -3,7 +3,6 @@ package verzija1;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.StringTokenizer;
 import javafx.beans.property.IntegerProperty;
@@ -26,7 +25,8 @@ public class Util
         int i=0;
         for(String line : lines){
             StringTokenizer tokenzier = new StringTokenizer(line, ",");
-            if(tokenzier.countTokens()>=colNum)
+            int a = tokenzier.countTokens();
+            if(a>colNum)
                 throw new IllegalArgumentException("File doesn't have a proper format. Line "+ i+" has more numbers then it should.");
                 
             int j=0;
@@ -42,7 +42,7 @@ public class Util
     }
 
     public static void writeMatrix(IntegerProperty[][] matrix, File file) throws IOException{
-        if(matrix==null || file==null || file.exists() || matrix.length==0 || matrix[0].length == 0 || !file.canWrite())
+        if(matrix==null || file==null || matrix.length==0 || matrix[0].length == 0)
             throw new IllegalArgumentException("Invalid input parameters");
         
         StringBuilder bld = new StringBuilder();
@@ -56,7 +56,7 @@ public class Util
             bld.append("\n");
         }
         
-        Files.write(file.toPath(), bld.toString().getBytes(), CREATE_NEW, TRUNCATE_EXISTING);
+        Files.write(file.toPath(), bld.toString().getBytes("UTF-8"), CREATE, TRUNCATE_EXISTING);
     }
     
     public static void writeMatrix(IntegerProperty[][] matrix){

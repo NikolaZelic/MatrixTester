@@ -8,11 +8,11 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="PrikazMatrica.jar" size="3781" download="eager" />
+    <jar href="PrikazMatrica.jar" size="30074" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="PrikazMatrica" >
     <param name="requiredFXVersion" value="8.0+"/>
   </applet-desc>
-  <jfx:javafx-desc  width="800" height="600" main-class="prototipi.test1"  name="PrikazMatrica" />
+  <jfx:javafx-desc  width="800" height="600" main-class="verzija1.Test"  name="PrikazMatrica" />
   <update check="always"/>
 </jnlp>

@@ -1,8 +1,11 @@
 package verzija1;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -17,6 +20,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
@@ -51,7 +55,7 @@ public final class Playground extends GridPane
         for(int i=0; i<m.length; i++){
             for(int j=0; j<m[i].length; j++){
                 Cell cell = new Cell(m[i][j], valueMap, this);
-                gridPane.add(cell, i, j);
+                gridPane.add(cell, j, i);
             }
         }
     }
@@ -91,6 +95,12 @@ public final class Playground extends GridPane
             }
         }
     }
+    protected void clearMatrix(){
+        IntegerProperty[][] m = getMatrix();
+        for(int i=0; i<m.length; i++)
+            for(int j=0; j<m[i].length; j++)
+                m[i][j].setValue(0);
+    }
     
     // VALUSE FUNCTIONS
     public Map<Integer, String> getValueMap(){
@@ -111,6 +121,24 @@ public final class Playground extends GridPane
         result.put(1, "Zid");
         return result;
     }
+    
+    public void openFile(File file)
+    {
+        try{
+            IntegerProperty[][] matrix = Util.parseFileToMatrix(file);
+            if (matrix != null)
+            {
+                iTf.setText(matrix.length+"");
+                jTf.setText(matrix[0].length+"");
+                setMatrix(matrix);
+            }
+        } 
+        catch (IOException e){
+            System.out.println(e);
+        }
+        
+    }
+    protected MatrixAction action;
     
     // JAVA_FX 
     protected GridPane gridPane;
@@ -138,7 +166,6 @@ public final class Playground extends GridPane
             legend.getChildren().add(btn);
             btn.setOnAction((event) -> {
                 selectLegend = (Integer)btn.getUserData();
-                System.out.println(selectLegend);
             });
         });
         
@@ -146,7 +173,6 @@ public final class Playground extends GridPane
         clear.setToggleGroup(group);
         clear.setOnAction((event) -> {
             selectLegend = null;
-            System.out.println(selectLegend);
         });
         legend.getChildren().add(clear);
     }
@@ -165,8 +191,13 @@ public final class Playground extends GridPane
             File outputFile = fileChooser.showSaveDialog(getScene().getWindow());
             if(outputFile==null)
                 return;
-            // Write matrix to file
-            
+             // Write matrix to file
+            try{
+                Util.writeMatrix(matrix.getValue(), outputFile);
+            } 
+            catch (IOException ex){
+                System.out.println(ex);
+            }
         });
         
         open = new Button("open");
@@ -175,12 +206,24 @@ public final class Playground extends GridPane
             fileChooser.setTitle("Open Resource File");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text", "*.txt"));
             File inputFile = fileChooser.showOpenDialog(getScene().getWindow());
-            System.out.println(inputFile);
+//            System.out.println(inputFile);
             if(inputFile==null)
                 return;
+            openFile(inputFile);
         });
         
-        heder = new HBox(iTf, jTf, changeDimenstionsBtn, save, open);
+        Button clear = new Button("Clear");
+        clear.setTooltip(new Tooltip("Set all values to 0"));
+        clear.setOnAction((event) -> {
+            clearMatrix();
+        });
+        
+        Button run = new Button("Run code");
+        run.setOnAction((ActionEvent event) -> {
+            action.action(matrix.getValue(), valueMap);
+        });
+        
+        heder = new HBox(iTf, jTf, changeDimenstionsBtn, save, open, clear, run);
     }
     protected EventHandler<ActionEvent> changeDimesnionsEvent = (ActionEvent event) -> {
         try{
@@ -194,7 +237,8 @@ public final class Playground extends GridPane
         }
     };
     
-    public Playground(Map<Integer, String> valuMap, Map<Integer, String> valueLegend){
+    public Playground(Map<Integer, String> valuMap, Map<Integer, String> valueLegend, MatrixAction action){
+        this.action = action;
         this.valueMap = valuMap;
         this.valueLegend = valueLegend;
         setUpHeder();
